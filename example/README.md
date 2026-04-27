@@ -1,4 +1,4 @@
-Open up dev tools, and you can use the library to defined functions to draw to the screen via domain coloring. You can set a custom function by assigning to the 'f' variable. For example:
+Open up dev tools, and you can use the library to define functions to draw to the screen via domain coloring. You can set a custom function by assigning to the 'f' variable. For example:
 
 ```javascript
 f = z => Complex.addScalar(Complex.square(z),1);
