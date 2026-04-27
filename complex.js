@@ -51,6 +51,9 @@ function fpclassify(x) {
 function feraiseexcept() {} // not relevant to javascript
 
 function math_check_force_underflow_complex() {} // same here
+function math_check_force_underflow_nonneg() {}
+function math_check_force_underflow() {}
+
 
 function signbit(x) {
   if (x === 0) return 1/x > 0 ? 0 : 1;
@@ -533,7 +536,7 @@ function clog(x) {
 
     if (absx == 1 && scale == 0) {
       buffer[result] = M_LOG1P(absy * absy) / 2;
-      // math_check_force_underflow_nonneg (buffer[result]);
+      math_check_force_underflow_nonneg (buffer[result]);
     } else if (absx > 1 && absx < 2 && absy < 1 && scale == 0) {
       var d2m1 = (absx - 1) * (absx + 1);
       if (absy >= M_EPSILON)
@@ -611,7 +614,7 @@ function clog10(x) {
     if (absx == 1 && scale == 0) {
       buffer[result] = (M_LOG1P(absy * absy)
                      * (M_LOG10E / 2));
-      // math_check_force_underflow_nonneg (buffer[result]);
+      math_check_force_underflow_nonneg (buffer[result]);
     } else if (absx > 1 && absx < 2 && absy < 1 && scale == 0) {
       var d2m1 = (absx - 1) * (absx + 1);
       if (absy >= M_EPSILON)
