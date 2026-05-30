@@ -897,7 +897,7 @@ Complex.prototype.getAbs = function() {
   return hypot(this.re, this.im);
 }
 
-Complex.prototype.getImag = function() {
+Complex.prototype.getArg = function() {
   return Math.atan2(this.im, this.re);
 }
 
@@ -940,7 +940,7 @@ Object.defineProperties(Complex.prototype, {
     enumerable: false,
     configurable: true,
   },
-  arg: {
+  theta: {
     get: Complex.prototype.getArg,
     set: Complex.prototype.setArg,
     enumerable: false,
