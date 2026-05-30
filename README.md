@@ -13,192 +13,440 @@ usage (web):
 <script src="complex.js"></script>
 ```
 
-The base of library is a direct port of glibc complex number function implementations. These functions include:
+## Properties
 
-- creal, cimag, cabs, carg, conj, cproj
-- cexp, clog, clog10, cpow, csqrt
-- csin, ccos, ctan, csinh, ccosh, ctanh
-- casin, cacos, catan, casinh, cacosh, catanh
+### Static
 
-Each of which should behave identical to the original functions to the extent possible in JavaScript. Some things, such as floating-point exception flags, have been left out in favor of practicality. The corresponding functions have been left in the main file but are defined as no-op. This is done in attempt to leave the functions as un-altered as possible.
+todo
 
-Each of the constants and helper functions have also been named as they appear in the original code. This introduces some redundacy and additional overhead, though provides a good working model to experiment with in a JavaScript environment.
+### Instance
 
-Much additional behavior and functions have been inluded on top of the ones mentioned above. These are not glibc ports and many of which are implemented via naive methods and haven't been optimized much.
-
-The data structure within the main file has complex numbers all stored in a single Float64Array buffer. Complex numbers are then represented by their index where they are stored in this buffer. All functions expect complex number arguments to be provided in this form. This README and related documentation are a work in progress and are intended on being updated further in the future. The following is an AI generated write-up that can be referenced for more details.
-
-# complex_glibc.js
- 
-A complex number library for JavaScript, ported from glibc's math implementation with additional functions. Uses a typed array buffer for allocation-free arithmetic.
- 
-## Design
- 
-All complex numbers are stored as pairs of `Float64` values in a shared `Float64Array` buffer. Functions return an integer index into this buffer rather than allocating objects. This avoids GC pressure in tight loops such as domain coloring renderers or iterative algorithms.
- 
-```js
-var z = Complex.create(1, 2);   // returns buffer index
-var w = Complex.exp(z);         // returns buffer index
-console.log(Complex.toString(w));
+data properties:
+```javascript
+re
+im
 ```
- 
-Call `Complex.resetBuffer()` between frames or computation passes to reclaim space.
- 
-## Installation
- 
-```html
-<script src="complex_glibc.js"></script>
-<!-- Complex is available as a global -->
+pseudo-properties:
+```javascript
+get real()
+set real(x)
+get imag()
+set imag(y)
+get r()
+set r(r)
+get theta()
+set theta(phi)
 ```
- 
-```js
-// Node
-const Complex = require('./complex_glibc.js');
+
+## Included Functions
+
+### Constructors
+
+create a new complex number given euclidean components:
+```javascript
+constructor(x, y)
+static create(x=0, y=0)
+static fromScalar(n=0)
+atatic fromArray(array, offset=0)
 ```
- 
-## API
- 
-### Buffer
- 
-| Function | Description |
-|---|---|
-| `Complex.resetBuffer()` | Reset buffer index to 0 |
-| `Complex.BUFFER` | The underlying `Float64Array` |
-| `Complex.BUFFER_SIZE` | Current buffer size (settable) |
-| `Complex.INDEX` | Current buffer index (settable) |
- 
-### Create / Inspect
- 
-| Function | Description |
-|---|---|
-| `Complex.create(re, im)` | Create complex number |
-| `Complex.real(z)` | Real part |
-| `Complex.imag(z)` | Imaginary part |
-| `Complex.abs(z)` | Absolute value (modulus) |
-| `Complex.arg(z)` | Argument (angle) |
-| `Complex.toString(z)` | String representation |
- 
-### Arithmetic
- 
-| Function | Description |
-|---|---|
-| `Complex.add(z, w)` | z + w |
-| `Complex.sub(z, w)` | z - w |
-| `Complex.mul(z, w)` | z * w |
-| `Complex.div(z, w)` | z / w |
-| `Complex.addScalar(z, n)` | z + n |
-| `Complex.subScalar(z, n)` | z - n |
-| `Complex.mulScalar(z, n)` | z * n |
-| `Complex.divScalar(z, n)` | z / n |
-| `Complex.neg(z)` | -z |
-| `Complex.inv(z)` | 1/z |
-| `Complex.conj(z)` | Conjugate |
-| `Complex.sgn(z)` | Sign (unit vector) |
-| `Complex.square(z)` | z² |
-| `Complex.cube(z)` | z³ |
- 
-### Exponential / Logarithm
- 
-| Function | Description |
-|---|---|
-| `Complex.exp(z)` | eᶻ |
-| `Complex.log(z)` | ln(z) |
-| `Complex.log10(z)` | log₁₀(z) |
-| `Complex.log2(z)` | log₂(z) |
-| `Complex.pow(z, w)` | zʷ |
-| `Complex.sqrt(z)` | √z |
- 
-### Trigonometric
- 
-| Function | Description |
-|---|---|
-| `Complex.sin(z)` | sin(z) |
-| `Complex.cos(z)` | cos(z) |
-| `Complex.tan(z)` | tan(z) |
-| `Complex.sec(z)` | sec(z) |
-| `Complex.csc(z)` | csc(z) |
-| `Complex.cot(z)` | cot(z) |
-| `Complex.asin(z)` | arcsin(z) |
-| `Complex.acos(z)` | arccos(z) |
-| `Complex.atan(z)` | arctan(z) |
-| `Complex.asec(z)` | arcsec(z) |
-| `Complex.acsc(z)` | arccsc(z) |
-| `Complex.acot(z)` | arccot(z) |
- 
-### Hyperbolic
- 
-| Function | Description |
-|---|---|
-| `Complex.sinh(z)` | sinh(z) |
-| `Complex.cosh(z)` | cosh(z) |
-| `Complex.tanh(z)` | tanh(z) |
-| `Complex.sech(z)` | sech(z) |
-| `Complex.csch(z)` | csch(z) |
-| `Complex.coth(z)` | coth(z) |
-| `Complex.asinh(z)` | arcsinh(z) |
-| `Complex.acosh(z)` | arccosh(z) |
-| `Complex.atanh(z)` | arctanh(z) |
-| `Complex.asech(z)` | arcsech(z) |
-| `Complex.acsch(z)` | arccsch(z) |
-| `Complex.acoth(z)` | arccoth(z) |
- 
-### Special Functions
- 
-| Function | Description |
-|---|---|
-| `Complex.gamma(z)` | Γ(z) via Lanczos approximation |
-| `Complex.fact(z)` | z! = Γ(z+1) |
-| `Complex.beta(z, w)` | B(z,w) = Γ(z)Γ(w)/Γ(z+w) |
-| `Complex.binom(z, w)` | Binomial coefficient C(z,w) |
-| `Complex.sinc(z)` | Normalized sinc |
-| `Complex.cis(x)` | cos(x) + i·sin(x) |
-| `Complex.mod(z, w)` | Complex modulo |
- 
-### Utility
- 
-| Function | Description |
-|---|---|
-| `Complex.derivative(f, h?)` | Numerical derivative, default h=1e-7 |
-| `Complex.equal(z, w, t?)` | Equality within tolerance |
-| `Complex.isNaN(z)` | NaN test |
-| `Complex.isFinite(z)` | Finite test |
-| `Complex.isZero(z)` | Zero test |
-| `Complex.isReal(z)` | Real test (imaginary part is zero) |
-| `Complex.random()` | Random complex in [0,1)² |
-| `Complex.min(...z)` | Component-wise minimum |
-| `Complex.max(...z)` | Component-wise maximum |
-| `Complex.floor(z)` | Component-wise floor |
-| `Complex.ceil(z)` | Component-wise ceil |
-| `Complex.round(z)` | Component-wise round |
-| `Complex.trunc(z)` | Component-wise truncate |
- 
-## Example — Domain Coloring
- 
-```js
-function draw(f) {
-  Complex.resetBuffer();
-  var imageData = ctx.createImageData(canvas.width, canvas.height);
-  var data = imageData.data;
-  var w = canvas.width, h = canvas.height, s = Math.min(w, h);
-  var i = 0;
-  for (var cy = 0; cy < h; cy++) {
-    for (var cx = 0; cx < w; cx++) {
-      var z = Complex.create((cx - w/2) / s, (h/2 - cy) / s);
-      var out = f(z);
-      var hue = (Complex.arg(out) / (2*Math.PI) + 1) % 1;
-      var lig = 1 - 1/(1 + Math.log1p(Complex.abs(out)));
-      // HSL to RGB ...
-      data[i++] = r; data[i++] = g; data[i++] = b; data[i++] = 255;
-    }
-  }
-  ctx.putImageData(imageData, 0, 0);
-}
- 
-draw(z => Complex.gamma(z));
+create a new complex number given polar components:
+```javascript
+static polar(r=0,phi=0)
+static cis(phi=0)
+static fromArrayPolar(array,offset=0)
 ```
- 
-## Notes
- 
-- Core trig, hyperbolic, exponential, and logarithm functions are ported directly from glibc and handle all IEEE 754 edge cases including signed zeros, infinities, and NaNs.
-- Special functions (gamma, beta, etc.) use standard approximations and have not been exhaustively tested over all edge cases.
-- The buffer is a flat `Float64Array`. If you run out of space, increase `Complex.BUFFER_SIZE` or call `resetBuffer()` more frequently.
+### Copy & Clone
+
+create a clone of a complex number with the same components:
+```javascript
+static clone(z)
+clone()
+```
+copy the components of a complex number to another:
+```javascript
+static clone(z)     // new Complex = z
+static copy(z, w)   // z = w
+static copyTo(z, w) // w = z
+clone()             // new Complex = z
+copy(z)             // this = z
+copyTo(z)           // z = this
+```
+### Type Conversion
+
+write a complex numbers components into a new or existing array:
+```javascript
+static toArray(z, array=[], offset=0)
+static toArrayPolar(z,array=[], offset=0)
+toArray(array=[], offset=0)
+toArrayPolar(array=[], offset=0)
+```
+get a string representation of a complex number
+```javascript
+toString()
+```
+### Setters
+
+set the euclidean real/imaginary components of a complex number:
+```javascript
+static setReal(z, x)
+static setImag(z, y)
+static set(z, x, y)
+static setScalar(z, n)
+static setComponent(z, i, n)
+static setFromArray(z, array, offset=0)
+setReal(x)
+setImag(y)
+set(x, y)
+setScalar(n)
+setComponent(i, n)
+setFromArray(array, offset=0)
+```
+set the polar magnitude/argument components of a complex number:
+```javascript
+static setAbs(z, r)
+static setArg(z, phi)
+static setPolar(z, x, y)
+static setFromArrayPolar(z, array, offset=0)
+setAbs(r)
+setArg(phi)
+setPolar(r, phi)
+setFromArrayPolar(array, offset=0)
+```
+### Setters
+
+get the euclidean real/imaginary components of a complex number
+```javascript
+static getReal(z)
+static getImage(z)
+static getComponent(z, i)
+static complexReal(z)
+static complexImag(z)
+getReal()
+getImage()
+getComponent(i)
+getComplexReal()
+getComplexImag()
+```
+get the polar magnitude/argument components of a complex number:
+```javascript
+static getAbs(z)
+static getArg(z)
+static getComplexAbs(z)
+static getComplexArg(z)
+getAbs()
+getArg()
+getComplexAbs()
+getComplexArg()
+```
+### Operations
+
+#### Additive Operations
+
+add complex numbers:
+```javascript
+static add(z, w)
+add(z)
+addEq(z)
+```
+add a scalar to a complex number:
+```javascript
+static addScalar(z,n)
+addScalar(n)
+addScalarEq(n)
+```
+
+subtract complex numbers:
+```javascript
+static sub(z, w)
+sub(z)
+subEq(z)
+```
+subtract a scalar from a complex number:
+```javascript
+static subScalar(z, n)
+subScalar(n)
+subScalarEq(n)
+```
+subtract a complex number from a scalar:
+```javascript
+static scalarSub(n, z)
+scalarSub(n)
+scalarSubEq(n)
+```
+negate a complex number:
+```javascript
+static neg(z)
+neg()
+negEq()
+```
+take the conjugate of a complex number:
+```javascript
+static conj(z)
+conj()
+conjEq()
+```
+#### Multiplicative Operations
+
+multiply complex numbers:
+```javascript
+static mul(z, w)
+mul(z)
+mulEq(z)
+```
+multiply a complex number by a scalar:
+```javascript
+static mulScalar(z, n)
+mulScalar(n)
+mulScalarEq(n)
+```
+divide complex numbers:
+```javascript
+static div(z, w)
+div(z)
+divEq(z)
+```
+divide a complex number by a scalar:
+```javascript
+static divScalar(z, n)
+divScalar(n)
+divScalarEq(n)
+```
+divide a scalar by a complex number:
+```javascript
+static scalarDiv(z, n)
+scalarDiv(n)
+scalarDivEq(n)
+```
+take the reciprocal of a complex number:
+```javascript
+static inv(z)
+inv()
+invEq()
+```
+take the directed sign of a complex number:
+```javascript
+static sgn(z)
+sgn()
+sgnEq()
+```
+take the projection a complex number on the riemann sphere:
+```javascript
+static proj(z)
+prog()
+projEq()
+```
+#### Exponential and Logarithmic Operations
+
+take e to the power of a complex number:
+```javascript
+static exp(z)
+exp()
+expEq()
+```
+take the a logarithm of a complex number:
+```javascript
+static log(z)
+static log10(z)
+static log2(z)
+log()
+log10()
+log2()
+logEq()
+log10Eq()
+log2Eq()
+```
+take the complex power of a complex number:
+```javascript
+static pow(z, w)
+pow(z)
+powEq(z)
+```
+take the principal square root of a complex number:
+```javascript
+static sqrt(z)
+sqrt()
+sqrtEq()
+```
+#### Trigonometric Operations
+
+take the sine, cosine, and tangent of a complex number:
+```javascript
+static sin(z)
+static cos(z)
+static tan(z)
+sin()
+cos()
+tan()
+sinEq()
+cosEq()
+tanEq()
+```
+take the hyperbolic sine, cosine, and tangent of a complex number:
+```javascript
+static sinh(z)
+static cosh(z)
+static tanh(z)
+sinh()
+cosh()
+tanh()
+sinhEq()
+coshEq()
+tanhEq()
+```
+take the inverse sine, cosine, and tangent of a complex number:
+```javascript
+static asin(z)
+static acos(z)
+static atan(z)
+asin()
+acos()
+atan()
+asinEq()
+acosEq()
+atanEq()
+```
+take the inverse hyperbolic sine, cosine, and tangent of a complex number:
+```javascript
+static asinh(z)
+static acosh(z)
+static atanh(z)
+asinh()
+acosh()
+atanh()
+asinhEq()
+acoshEq()
+atanhEq()
+```
+#### Trigonometric Reciprocals
+
+take the secant, cosecant, and cotangent of a complex number:
+```javascript
+static sec(z)
+static csc(z)
+static cot(z)
+sec()
+csc()
+cot()
+secEq()
+cscEq()
+cotEq()
+```
+take the hyperbolic secant, cosecant, and cotangent of a complex number:
+```javascript
+static sech(z)
+static csch(z)
+static coth(z)
+sech()
+csch()
+coth()
+sechEq()
+cschEq()
+cothEq()
+```
+take the inverse secant, cosecant, and cotangent of a complex number:
+```javascript
+static asec(z)
+static acsc(z)
+static acot(z)
+asec()
+acsc()
+acot()
+asecEq()
+acscEq()
+acotEq()
+```
+take the inverse hyperbolic secant, cosecant, and cotangent of a complex number:
+```javascript
+static asech(z)
+static acsch(z)
+static acoth(z)
+asech()
+acsch()
+acoth()
+asechEq()
+acschEq()
+acothEq()
+```
+#### Component-Wise Operations
+
+rounding functions:
+```javascript
+static floor(z)
+static ceil(z)
+static trunc(z)
+static round(z)
+static fround(z)
+floor()
+ceil()
+trunc()
+round()
+fround()
+floorEq()
+ceilEq()
+truncEq()
+roundEq()
+froundEq()
+```
+complex mod:
+```javascript
+static mod(z, w)
+mod()
+modEq()
+```
+random:
+```javascript
+static random()
+static setRandom(z)
+setRandom()
+```
+variadic operations:
+```javascript
+static sum(...z)
+static prod(...z)
+static min(...z)
+static max(...z)
+sum(...z)
+prod(...z)
+min(...z)
+max(...z)
+sumEq(...z)
+prodEq(...z)
+minEq(...z)
+maxEq(...z)
+```
+#### Boolean Tests
+
+check if two complex numbers are equal:
+```javascript
+static equal(z, w, t=EPSILON)
+equal(z, t=EPSILON)
+```
+check the classification of a complex number:
+```javascript
+static isNaN(z)
+static isFinite(z)
+static isZero(z)
+static isReal(z)
+```
+#### Special Functions
+
+```javascript
+static erf(z)
+static gamma(z)
+static fact(z)
+static beta(z, w)
+static binom(z, w)
+static lambertw(z)
+erf()
+gamma()
+fact()
+beta(z)
+binom(z)
+lambertw()
+erfEq()
+gammaEq()
+factEq()
+betaEq(z)
+binomEq(z)
+lambertwEq()
+```
