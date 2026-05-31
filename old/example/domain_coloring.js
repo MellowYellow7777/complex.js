@@ -12,6 +12,26 @@ resize();
 
 window.onresize = resize;
 
+const input = document.createElement('input');
+input.placeholder = 'e.g. Complex.sin(z)';
+
+const button = document.createElement('button');
+button.textContent = 'Apply';
+
+document.body.appendChild(input);
+document.body.appendChild(button);
+
+button.onclick = () => {
+  try {
+    // Creates: f = function(z) { return <input value>; }
+    f = new Function('z', `return ${input.value};`);
+    draw();
+  } catch (err) {
+    console.error(err);
+    alert('Invalid expression');
+  }
+};
+
 function hue2rgb(p, q, t) {
   if (t < 0) t += 1;
   if (t > 1) t -= 1;
