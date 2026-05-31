@@ -12,25 +12,40 @@ resize();
 
 window.onresize = resize;
 
+// UI
+const ui = document.createElement('div');
+ui.style.position = 'fixed';
+ui.style.top = '10px';
+ui.style.left = '10px';
+ui.style.zIndex = '9999';
+ui.style.background = 'rgba(255,255,255,0.9)';
+ui.style.padding = '8px';
+ui.style.borderRadius = '8px';
+
 const input = document.createElement('input');
-input.placeholder = 'e.g. Complex.sin(z)';
+input.value = 'Complex.acsch(z)';
+input.style.width = '250px';
 
 const button = document.createElement('button');
 button.textContent = 'Apply';
+button.style.marginLeft = '5px';
 
-document.body.appendChild(input);
-document.body.appendChild(button);
+ui.appendChild(input);
+ui.appendChild(button);
+document.body.appendChild(ui);
 
 button.onclick = () => {
   try {
-    // Creates: f = function(z) { return <input value>; }
     f = new Function('z', `return ${input.value};`);
     draw();
-  } catch (err) {
-    console.error(err);
-    alert('Invalid expression');
+  } catch (e) {
+    alert('Invalid expression:\n' + e.message);
   }
 };
+
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter') button.click();
+});
 
 function hue2rgb(p, q, t) {
   if (t < 0) t += 1;
